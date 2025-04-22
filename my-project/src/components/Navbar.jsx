@@ -147,7 +147,7 @@ const Navbar = ({ darkMode, toggleDarkMode, compareMode, toggleCompareMode }) =>
                     ? 'linear-gradient(to right, #60a5fa, #a78bfa)' 
                     : 'linear-gradient(to right, #ffffff, #e0f2fe)'
                 }}>
-                  Countries Explorer
+                  World Countries
                 </span>
                 <span className={`absolute top-0 left-0 text-xl sm:text-2xl font-bold whitespace-nowrap transition-all duration-500 transform ${isHovering ? 'translate-y-0' : 'translate-y-[100%]'}`} style={{ 
                   WebkitBackgroundClip: 'text', 
@@ -156,11 +156,11 @@ const Navbar = ({ darkMode, toggleDarkMode, compareMode, toggleCompareMode }) =>
                     ? 'linear-gradient(to right, #a78bfa, #60a5fa)' 
                     : 'linear-gradient(to right, #e0f2fe, #ffffff)'
                 }}>
-                  Countries Explorer
+                  World Countries
                 </span>
               </div>
               <span className={`block text-xs ${darkMode ? 'text-gray-400' : 'text-blue-100'} transition-all duration-500 ${isHovering ? 'translate-x-1' : ''}`}>
-                Discover the world
+                Explore the globe
               </span>
             </div>
           </Link>

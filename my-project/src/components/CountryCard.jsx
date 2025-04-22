@@ -1,7 +1,11 @@
 function CountryCard({ country, onClick, darkMode, isFavorite, onToggleFavorite, compareMode, isSelected, index }) {
   const handleFavoriteClick = (e) => {
-    e.stopPropagation()
-    onToggleFavorite(country)
+    // Prevent default browser behavior
+    e.preventDefault();
+    // Stop the event from bubbling up to parent elements
+    e.stopPropagation();
+    // Call the toggle favorite function with the event
+    onToggleFavorite(e);
   }
 
   // Calculate animation delay based on card index for staggered effect
@@ -48,7 +52,7 @@ function CountryCard({ country, onClick, darkMode, isFavorite, onToggleFavorite,
           {!compareMode && (
             <button
               onClick={handleFavoriteClick}
-              className={`p-1.5 rounded-full transition-all ${
+              className={`p-1.5 rounded-full transition-all z-10 ${
                 isFavorite 
                   ? 'bg-yellow-400 text-gray-900 shadow-md' 
                   : darkMode 

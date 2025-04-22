@@ -50,6 +50,17 @@ function CountryList({
     }
   };
   
+  // This is a fixed handler for the favorite toggle
+  const handleFavoriteToggle = (e, country) => {
+    // Make sure the event doesn't bubble up
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    // Call the parent component's toggle function
+    onToggleFavorite(country);
+  };
+  
   const goToPage = (pageNumber) => {
     // Don't do anything if clicked on current page or invalid page
     if (pageNumber === currentPage || pageNumber < 1 || pageNumber > totalPages) return;
@@ -88,10 +99,7 @@ function CountryList({
             onClick={() => handleCardClick(country)}
             darkMode={darkMode}
             isFavorite={favorites?.some(fav => fav.cca3 === country.cca3)}
-            onToggleFavorite={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(country);
-            }}
+            onToggleFavorite={(e) => handleFavoriteToggle(e, country)}
             compareMode={compareMode}
             isSelected={countriesToCompare?.some(c => c.cca3 === country.cca3)}
             index={index}

@@ -1,4 +1,4 @@
-# Countries Explorer with Authentication
+# World Countries with Authentication
 
 A full-stack application that allows users to explore countries around the world with user authentication features.
 

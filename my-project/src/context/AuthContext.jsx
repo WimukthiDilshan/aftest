@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
           const parsedUser = JSON.parse(userInfo);
           
           // Verify token is still valid by making a request to profile endpoint
-          const response = await fetch('http://localhost:5000/api/users/profile', {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
             headers: {
               Authorization: `Bearer ${parsedUser.token}`
             }

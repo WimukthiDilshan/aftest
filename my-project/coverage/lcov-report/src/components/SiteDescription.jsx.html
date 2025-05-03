@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/components/ProtectedRoute.jsx</title>
+    <title>Code coverage report for src/components/SiteDescription.jsx</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,20 +19,20 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> ProtectedRoute.jsx</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> SiteDescription.jsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
@@ -87,55 +87,85 @@
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
 &nbsp;
-const ProtectedRoute = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> children }) =&gt; {</span>
-  const { user, loading } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  if (loading) {</span>
-    // Show loading spinner or screen while checking authentication
-<span class="cstat-no" title="statement not covered" >    return (</span>
-      &lt;div className="min-h-screen flex items-center justify-center"&gt;
-        &lt;div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"&gt;&lt;/div&gt;
+const SiteDescription = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  return (</span>
+    &lt;div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-16 px-4"&gt;
+      &lt;div className="max-w-6xl mx-auto"&gt;
+        &lt;div className="text-center space-y-6"&gt;
+          &lt;h1 className="text-4xl md:text-5xl font-bold animate-fade-in"&gt;
+            Explore the World's Nations
+          &lt;/h1&gt;
+          &lt;p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed animate-fade-in"&gt;
+            Discover detailed information about countries worldwide. Compare populations, 
+            explore regions, and learn about different cultures - all in one place.
+          &lt;/p&gt;
+          &lt;div className="flex justify-center space-x-4 mt-8"&gt;
+            &lt;div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center animate-pulse"&gt;
+              &lt;h3 className="font-bold text-lg"&gt;200+ Countries&lt;/h3&gt;
+              &lt;p className="text-sm"&gt;Comprehensive data&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center animate-pulse"&gt;
+              &lt;h3 className="font-bold text-lg"&gt;Real-time Info&lt;/h3&gt;
+              &lt;p className="text-sm"&gt;Up-to-date statistics&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center animate-pulse"&gt;
+              &lt;h3 className="font-bold text-lg"&gt;Easy Comparison&lt;/h3&gt;
+              &lt;p className="text-sm"&gt;Compare countries&lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
-    );
-  }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!user) {</span>
-    // If user is not authenticated, redirect to login page
-<span class="cstat-no" title="statement not covered" >    return &lt;Navigate to="/login" replace /&gt;;</span>
-  }
-&nbsp;
-  // If user is authenticated, render the children components
-<span class="cstat-no" title="statement not covered" >  return children;</span>
+    &lt;/div&gt;
+  );
 };
 &nbsp;
-export default ProtectedRoute; </pre></td></tr></table></pre>
+export default SiteDescription; </pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->

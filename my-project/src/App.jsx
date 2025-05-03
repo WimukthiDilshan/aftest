@@ -11,6 +11,7 @@ import Register from './components/Register'
 import Profile from './components/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import WorldMap from './components/WorldMap'
+import SiteDescription from './components/SiteDescription'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 function AppContent() {
@@ -313,302 +314,19 @@ function AppContent() {
   }, []);  // Run only once on component mount
 
   return (
-    <div className={darkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white relative bg-pattern-light bg-pattern-dark overflow-hidden">
-        <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} compareMode={compareMode} toggleCompareMode={toggleCompareMode} />
-        
+    <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} compareMode={compareMode} toggleCompareMode={toggleCompareMode} />
+      <main className="container mx-auto px-4 py-8">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/login" element={<LoginWrapper />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <>
-                <div className="container mx-auto px-4 py-8">
-                  <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">World Countries</h1>
-                    <button
-                      onClick={toggleCompareMode}
-                      className={`px-4 py-2 rounded-lg transition-colors ${
-                        compareMode
-                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                          : darkMode 
-                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                      }`}
-                    >
-                      {compareMode ? 'Exit Compare Mode' : 'Compare Countries'}
-                    </button>
-                  </div>
-                
-                  <div className="flex flex-col md:flex-row md:space-x-4 pb-8">
-                    <div className="w-full md:w-2/3 mb-4 md:mb-0">
-                      {!compareMode && (
-                        <SearchBar onSearch={handleSearch} searchTerm={searchTerm} darkMode={darkMode} />
-                      )}
-                    </div>
-                    <div className="w-full md:w-1/3">
-                      <Filter
-                        regions={Array.from(new Set(countries.map(country => country.region))).filter(Boolean)}
-                        selectedRegion={selectedRegion}
-                        onRegionChange={handleRegionFilter}
-                        populationRange={populationRange}
-                        onPopulationChange={handlePopulationFilter}
-                        sortBy={sortBy}
-                        onSortChange={handleSort}
-                        darkMode={darkMode}
-                        compareMode={compareMode}
-                        countriesToCompare={countriesToCompare}
-                        onCountryFilterChange={applyCompareFilters}
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Error/loading indicator */}
-                  {error ? (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-                      <p>{error}</p>
-                    </div>
-                  ) : loading ? (
-                    <div className="flex justify-center items-center h-64">
-                      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Map component */}
-                      {!compareMode && (
-                        <div className="mb-10 transform transition-all duration-700 hover:scale-[1.02]">
-                          <WorldMap 
-                            darkMode={darkMode} 
-                            onRegionClick={(region) => {
-                              // Set the selected region based on the region name
-                              const regionName = region.name;
-                              // Map the region names from the WorldMap component to the API's region names
-                              const regionMapping = {
-                                "North America": "Americas",
-                                "South America": "Americas",
-                                "Europe": "Europe",
-                                "Africa": "Africa",
-                                "Asia": "Asia",
-                                "Oceania": "Oceania",
-                                "Antarctica": "Antarctic"
-                              };
-                              
-                              const apiRegionName = regionMapping[regionName];
-                              handleRegionFilter(apiRegionName);
-                              
-                              // Show a notification or feedback
-                              const notification = document.createElement('div');
-                              notification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                              notification.textContent = `Showing countries in ${regionName}`;
-                              document.body.appendChild(notification);
-                              
-                              // Remove notification after 3 seconds
-                              setTimeout(() => {
-                                notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
-                                setTimeout(() => {
-                                  document.body.removeChild(notification);
-                                }, 500);
-                              }, 2500);
-                            }}
-                          />
-                        </div>
-                      )}
-                      
-                      {compareMode ? (
-                        // Side-by-side country lists
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {filteredCompareCountries.map((countries, index) => (
-                            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-                              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                                {countriesToCompare[index] ? 
-                                  `Similar to ${countriesToCompare[index].name.common}` : 
-                                  `Country List ${index + 1}`
-                                }
-                              </h2>
-                              <div className="h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                                {countries.map(country => (
-                                  <div 
-                                    key={country.cca3}
-                                    className={`flex items-center p-3 mb-2 border rounded-lg cursor-pointer transition-colors
-                                      ${darkMode 
-                                        ? 'border-gray-700 hover:bg-gray-700' 
-                                        : 'border-gray-200 hover:bg-gray-50'
-                                      }
-                                      ${countriesToCompare.some(c => c?.cca3 === country.cca3) ? 
-                                        'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-900' : ''
-                                      }
-                                    `}
-                                    onClick={() => addToCompare(country)}
-                                  >
-                                    <img 
-                                      src={country.flags.png} 
-                                      alt={`${country.name.common} flag`}
-                                      className="w-12 h-8 object-cover rounded mr-3"
-                                    />
-                                    <div>
-                                      <h3 className="font-medium text-gray-900 dark:text-white">
-                                        {country.name.common}
-                                      </h3>
-                                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {country.region} • Pop: {country.population.toLocaleString()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ))}
-                                {countries.length === 0 && (
-                                  <div className="flex flex-col items-center justify-center h-40 text-gray-500 dark:text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p>No countries match these filters</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        // Normal country list
-                        <CountryList
-                          countries={filteredCountries}
-                          onCountryClick={handleCountryClick}
-                          darkMode={darkMode}
-                          favorites={favorites}
-                          onToggleFavorite={toggleFavorite}
-                          compareMode={compareMode}
-                          countriesToCompare={countriesToCompare}
-                          onAddToCompare={addToCompare}
-                          onRemoveFromCompare={removeFromCompare}
-                        />
-                      )}
-                    </>
-                  )}
-                  
-                  {/* Standard comparison UI (when 2 countries are selected) */}
-                  {compareMode && countriesToCompare.length === 2 && (
-                    <div className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                      <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-                        Countries Comparison
-                      </h2>
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                          <thead>
-                            <tr>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Comparison</th>
-                              {countriesToCompare.map(country => (
-                                <th key={country.cca3} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                  <div className="flex items-center">
-                                    <img 
-                                      src={country.flags.png} 
-                                      alt={`${country.name.common} flag`}
-                                      className="w-6 h-4 mr-2 object-cover"
-                                    />
-                                    {country.name.common}
-                                    <button 
-                                      onClick={() => removeFromCompare(country.cca3)}
-                                      className="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                    >
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                      </svg>
-                                    </button>
-                                  </div>
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            {/* Existing comparison rows */}
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Population</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.population.toLocaleString()}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Area</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.area ? `${country.area.toLocaleString()} km²` : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Region</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.region}
-                                </td>
-                              ))}
-                            </tr>
-                            {/* Additional comparison rows */}
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Capital</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.capital ? country.capital.join(', ') : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Languages</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.languages ? Object.values(country.languages).join(', ') : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Currency</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.currencies 
-                                    ? Object.values(country.currencies).map(c => `${c.name} (${c.symbol})`).join(', ') 
-                                    : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Population Density</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.area 
-                                    ? `${(country.population / country.area).toFixed(2)} people/km²` 
-                                    : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/country/:code" element={
-            <ProtectedRoute>
-              <div className="container mx-auto px-4 py-8">
-                {loading ? (
-                  <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-                  </div>
-                ) : error ? (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-                    <p>{error}</p>
-                  </div>
-                ) : selectedCountry ? (
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <SiteDescription />
+                {selectedCountry ? (
                   <CountryDetail
                     country={selectedCountry}
                     onBack={handleBack}
@@ -620,150 +338,361 @@ function AppContent() {
                     onAddToCompare={() => addToCompare(selectedCountry)}
                   />
                 ) : (
-                  <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-                  </div>
-                )}
-              </div>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/favorites" element={
-            <ProtectedRoute>
-              <div className="container mx-auto px-4 py-8">
-                <h2 className="text-3xl font-bold mb-8 text-center dark:text-white fancy-heading">Your Favorite Countries</h2>
-                {favorites.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600 dark:text-gray-300">You haven't added any countries to your favorites yet.</p>
-                  </div>
-                ) : (
-                  <CountryList
-                    countries={favorites}
-                    onCountryClick={handleCountryClick}
-                    darkMode={darkMode}
-                    favorites={favorites}
-                    onToggleFavorite={toggleFavorite}
-                    compareMode={compareMode}
-                    countriesToCompare={countriesToCompare}
-                    onAddToCompare={addToCompare}
-                    onRemoveFromCompare={removeFromCompare}
-                  />
-                )}
-                
-                {/* Compare mode UI */}
-                {compareMode && countriesToCompare.length > 0 && (
-                  <div className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-                      Countries to Compare ({countriesToCompare.length}/2)
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {countriesToCompare.map(country => (
-                        <div 
-                          key={country.cca3}
-                          className="flex items-center p-3 border rounded-lg dark:border-gray-700"
-                        >
-                          <img 
-                            src={country.flags.png} 
-                            alt={`${country.name.common} flag`}
-                            className="w-12 h-8 mr-3 object-cover"
-                          />
-                          <span className="text-gray-900 dark:text-white">{country.name.common}</span>
-                          <button 
-                            onClick={() => removeFromCompare(country.cca3)}
-                            className="ml-auto p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
+                  <>
+                    <div className="flex justify-between items-center mb-6">
+                      <h1 className="text-2xl font-bold text-gray-900 dark:text-white"></h1>
+                      <button
+                        onClick={toggleCompareMode}
+                        className={`px-4 py-2 rounded-lg transition-colors mt-2 ${
+                          compareMode
+                            ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                            : darkMode 
+                              ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                              : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                        }`}
+                      >
+                        {compareMode ? 'Exit Compare Mode' : 'Compare Countries'}
+                      </button>
                     </div>
                     
-                    {countriesToCompare.length === 2 && (
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                          <thead>
-                            <tr>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Comparison</th>
-                              {countriesToCompare.map(country => (
-                                <th key={country.cca3} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                  {country.name.common}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Population</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.population.toLocaleString()}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Area</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.area ? `${country.area.toLocaleString()} km²` : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Region</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.region}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Capital</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.capital?.[0] || 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Currency</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.currencies ? Object.values(country.currencies).map(c => c.name).join(', ') : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Languages</td>
-                              {countriesToCompare.map(country => (
-                                <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                  {country.languages ? Object.values(country.languages).join(', ') : 'N/A'}
-                                </td>
-                              ))}
-                            </tr>
-                          </tbody>
-                        </table>
+                    <div className="flex flex-col md:flex-row md:space-x-4 pb-8">
+                      <div className="w-full md:w-2/3 mb-4 md:mb-0">
+                        {!compareMode && (
+                          <SearchBar onSearch={handleSearch} searchTerm={searchTerm} darkMode={darkMode} />
+                        )}
                       </div>
+                      <div className="w-full md:w-1/3">
+                        <Filter
+                          regions={Array.from(new Set(countries.map(country => country.region))).filter(Boolean)}
+                          selectedRegion={selectedRegion}
+                          onRegionChange={handleRegionFilter}
+                          populationRange={populationRange}
+                          onPopulationChange={handlePopulationFilter}
+                          sortBy={sortBy}
+                          onSortChange={handleSort}
+                          darkMode={darkMode}
+                          compareMode={compareMode}
+                          countriesToCompare={countriesToCompare}
+                          onCountryFilterChange={applyCompareFilters}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Error/loading indicator */}
+                    {error ? (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+                        <p>{error}</p>
+                      </div>
+                    ) : loading ? (
+                      <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Map component */}
+                        {!compareMode && (
+                          <div className="mb-10 transform transition-all duration-700 hover:scale-[1.02]">
+                            <WorldMap 
+                              darkMode={darkMode} 
+                              onRegionClick={(region) => {
+                                // Set the selected region based on the region name
+                                const regionName = region.name;
+                                // Map the region names from the WorldMap component to the API's region names
+                                const regionMapping = {
+                                  "North America": "Americas",
+                                  "South America": "Americas",
+                                  "Europe": "Europe",
+                                  "Africa": "Africa",
+                                  "Asia": "Asia",
+                                  "Oceania": "Oceania",
+                                  "Antarctica": "Antarctic"
+                                };
+                                
+                                const apiRegionName = regionMapping[regionName];
+                                handleRegionFilter(apiRegionName);
+                                
+                                // Show a notification or feedback
+                                const notification = document.createElement('div');
+                                notification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                                notification.textContent = `Showing countries in ${regionName}`;
+                                document.body.appendChild(notification);
+                                
+                                // Remove notification after 3 seconds
+                                setTimeout(() => {
+                                  notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                                  setTimeout(() => {
+                                    document.body.removeChild(notification);
+                                  }, 500);
+                                }, 2500);
+                              }}
+                            />
+                          </div>
+                        )}
+                        
+                        {compareMode ? (
+                          // Side-by-side country lists
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {filteredCompareCountries.map((countries, index) => (
+                              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                                <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                                  {countriesToCompare[index] ? 
+                                    `Similar to ${countriesToCompare[index].name.common}` : 
+                                    `Country List ${index + 1}`
+                                  }
+                                </h2>
+                                <div className="h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                                  {countries.map(country => (
+                                    <div 
+                                      key={country.cca3}
+                                      className={`flex items-center p-3 mb-2 border rounded-lg cursor-pointer transition-colors
+                                        ${darkMode 
+                                          ? 'border-gray-700 hover:bg-gray-700' 
+                                          : 'border-gray-200 hover:bg-gray-50'
+                                        }
+                                        ${countriesToCompare.some(c => c?.cca3 === country.cca3) ? 
+                                          'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-900' : ''
+                                        }
+                                      `}
+                                      onClick={() => addToCompare(country)}
+                                    >
+                                      <img 
+                                        src={country.flags.png} 
+                                        alt={`${country.name.common} flag`}
+                                        className="w-12 h-8 object-cover rounded mr-3"
+                                      />
+                                      <div>
+                                        <h3 className="font-medium text-gray-900 dark:text-white">
+                                          {country.name.common}
+                                        </h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                          {country.region} • Pop: {country.population.toLocaleString()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          // Normal country list
+                          <CountryList
+                            countries={filteredCountries}
+                            onCountryClick={handleCountryClick}
+                            darkMode={darkMode}
+                            favorites={favorites}
+                            onToggleFavorite={toggleFavorite}
+                            compareMode={compareMode}
+                            countriesToCompare={countriesToCompare}
+                            onAddToCompare={addToCompare}
+                            onRemoveFromCompare={removeFromCompare}
+                          />
+                        )}
+
+                        {/* Add comparison table to home page */}
+                        {compareMode && countriesToCompare.length === 2 && (
+                          <div className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                              Countries Comparison
+                            </h2>
+                            <div className="overflow-x-auto">
+                              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead>
+                                  <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Comparison</th>
+                                    {countriesToCompare.map(country => (
+                                      <th key={country.cca3} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        {country.name.common}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                  <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Population</td>
+                                    {countriesToCompare.map(country => (
+                                      <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {country.population.toLocaleString()}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                  <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Region</td>
+                                    {countriesToCompare.map(country => (
+                                      <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {country.region}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                  <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Capital</td>
+                                    {countriesToCompare.map(country => (
+                                      <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {country.capital ? country.capital.join(', ') : 'N/A'}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                  <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Languages</td>
+                                    {countriesToCompare.map(country => (
+                                      <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {country.languages ? Object.values(country.languages).join(', ') : 'N/A'}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                  <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Currencies</td>
+                                    {countriesToCompare.map(country => (
+                                      <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {country.currencies ? Object.values(country.currencies).map(curr => `${curr.name} (${curr.symbol || 'N/A'})`).join(', ') : 'N/A'}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
-                  </div>
+                  </>
                 )}
-                
-                <div className="mt-4 flex justify-center">
-                  <button
-                    onClick={toggleCompareMode}
-                    className={`${
-                      compareMode ? 'bg-red-500 hover:bg-red-600' : 'gradient-button'
-                    } text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300`}
-                  >
-                    {compareMode ? 'Cancel Comparison' : 'Compare Countries'}
-                  </button>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <ProtectedRoute>
+                <div className="container mx-auto px-4 py-8">
+                  <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Favorite Countries</h1>
+                    <button
+                      onClick={toggleCompareMode}
+                      className={`px-4 py-2 rounded-lg transition-colors mt-2 ${
+                        compareMode
+                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                          : darkMode 
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                      }`}
+                    >
+                      {compareMode ? 'Exit Compare Mode' : 'Compare Countries'}
+                    </button>
+                  </div>
+                  {favorites.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 dark:text-gray-300">You haven't added any countries to your favorites yet.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <CountryList
+                        countries={favorites}
+                        onCountryClick={handleCountryClick}
+                        darkMode={darkMode}
+                        favorites={favorites}
+                        onToggleFavorite={toggleFavorite}
+                        compareMode={compareMode}
+                        countriesToCompare={countriesToCompare}
+                        onAddToCompare={addToCompare}
+                        onRemoveFromCompare={removeFromCompare}
+                      />
+                      {compareMode && countriesToCompare.length === 2 && (
+                        <div className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                            Countries Comparison
+                          </h2>
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                              <thead>
+                                <tr>
+                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Comparison</th>
+                                  {countriesToCompare.map(country => (
+                                    <th key={country.cca3} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                      {country.name.common}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Population</td>
+                                  {countriesToCompare.map(country => (
+                                    <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                      {country.population.toLocaleString()}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Region</td>
+                                  {countriesToCompare.map(country => (
+                                    <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                      {country.region}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Capital</td>
+                                  {countriesToCompare.map(country => (
+                                    <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                      {country.capital ? country.capital.join(', ') : 'N/A'}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Languages</td>
+                                  {countriesToCompare.map(country => (
+                                    <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                      {country.languages ? Object.values(country.languages).join(', ') : 'N/A'}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Currencies</td>
+                                  {countriesToCompare.map(country => (
+                                    <td key={country.cca3} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                      {country.currencies ? Object.values(country.currencies).map(curr => `${curr.name} (${curr.symbol || 'N/A'})`).join(', ') : 'N/A'}
+                                    </td>
+                                  ))}
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
-              </div>
-            </ProtectedRoute>
-          } />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile darkMode={darkMode} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/country/:code"
+            element={
+              <ProtectedRoute>
+                <CountryDetail
+                  country={selectedCountry}
+                  onBack={handleBack}
+                  isFavorite={favorites.some(fav => fav?.cca3 === selectedCountry?.cca3)}
+                  onToggleFavorite={() => toggleFavorite(selectedCountry)}
+                  onBorderClick={getCountryByCode}
+                  darkMode={darkMode}
+                  compareMode={compareMode}
+                  onAddToCompare={() => addToCompare(selectedCountry)}
+                />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 }

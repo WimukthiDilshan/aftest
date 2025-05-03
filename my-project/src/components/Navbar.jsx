@@ -241,119 +241,156 @@ const Navbar = ({ darkMode, toggleDarkMode, compareMode, toggleCompareMode }) =>
             )}
             
             {/* Mobile menu button with animated icon */}
-            {user && (
-              <button 
-                type="button" 
-                className={`inline-flex items-center p-2 ml-1 text-sm rounded-lg md:hidden focus:outline-none focus:ring-2 focus:ring-gray-200 touch-target touch-ripple relative overflow-hidden ${
-                  darkMode 
-                    ? 'text-gray-400 hover:bg-gray-700 focus:ring-gray-600' 
-                    : 'text-gray-500 hover:bg-gray-100'
-                }`} 
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-expanded={mobileMenuOpen}
-              >
-                <span className="sr-only">Open main menu</span>
-                
-                {/* Button background pulse */}
-                <div className={`absolute inset-0 rounded-lg ${
+            <button 
+              type="button" 
+              className={`inline-flex items-center p-2 ml-1 text-sm rounded-lg md:hidden focus:outline-none focus:ring-2 focus:ring-gray-200 touch-target touch-ripple relative overflow-hidden ${
+                darkMode 
+                  ? 'text-gray-400 hover:bg-gray-700 focus:ring-gray-600' 
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`} 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
+            >
+              <span className="sr-only">Open main menu</span>
+              
+              {/* Button background pulse */}
+              <div className={`absolute inset-0 rounded-lg ${
+                mobileMenuOpen 
+                  ? darkMode ? 'bg-gray-700' : 'bg-gray-200' 
+                  : 'bg-transparent'
+              } transition-all duration-300`}></div>
+              
+              {/* Animated hamburger icon */}
+              <div className="w-6 h-6 relative">
+                <span className={`absolute h-0.5 rounded-full transition-all duration-300 transform ${
+                  darkMode ? 'bg-gray-300' : 'bg-gray-700'
+                } ${
                   mobileMenuOpen 
-                    ? darkMode ? 'bg-gray-700' : 'bg-gray-200' 
-                    : 'bg-transparent'
-                } transition-all duration-300`}></div>
-                
-                {/* Animated hamburger icon */}
-                <div className="w-6 h-6 relative">
-                  <span className={`absolute h-0.5 rounded-full transition-all duration-300 transform ${
-                    darkMode ? 'bg-gray-300' : 'bg-gray-700'
-                  } ${
-                    mobileMenuOpen 
-                      ? 'rotate-45 translate-y-0 w-6 top-3' 
-                      : 'w-6 top-1.5'
-                  }`}></span>
-                  <span className={`absolute h-0.5 w-6 rounded-full transition-all duration-300 ${
-                    darkMode ? 'bg-gray-300' : 'bg-gray-700'
-                  } ${
-                    mobileMenuOpen 
-                      ? 'opacity-0' 
-                      : 'opacity-100'
-                  } top-3`}></span>
-                  <span className={`absolute h-0.5 rounded-full transition-all duration-300 transform ${
-                    darkMode ? 'bg-gray-300' : 'bg-gray-700'
-                  } ${
-                    mobileMenuOpen 
-                      ? '-rotate-45 translate-y-0 w-6 top-3' 
-                      : 'w-6 top-4.5'
-                  }`}></span>
-                </div>
-              </button>
-            )}
+                    ? 'rotate-45 translate-y-0 w-6 top-3' 
+                    : 'w-6 top-1.5'
+                }`}></span>
+                <span className={`absolute h-0.5 w-6 rounded-full transition-all duration-300 ${
+                  darkMode ? 'bg-gray-300' : 'bg-gray-700'
+                } ${
+                  mobileMenuOpen 
+                    ? 'opacity-0' 
+                    : 'opacity-100'
+                } top-3`}></span>
+                <span className={`absolute h-0.5 rounded-full transition-all duration-300 transform ${
+                  darkMode ? 'bg-gray-300' : 'bg-gray-700'
+                } ${
+                  mobileMenuOpen 
+                    ? '-rotate-45 translate-y-0 w-6 top-3' 
+                    : 'w-6 top-4.5'
+                }`}></span>
+              </div>
+            </button>
           </div>
           
           {/* Main navigation */}
-          {user && (
-            <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 ${
-              mobileMenuOpen 
-                ? 'block opacity-100' 
-                : 'hidden md:flex opacity-0 md:opacity-100'
-            }`} id="navbar-user">
-              <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 ${
-                darkMode 
-                  ? 'bg-gray-800 md:bg-transparent border border-gray-700' 
-                  : 'bg-white md:bg-transparent border border-gray-200 shadow-sm'
-              }`}>
-                {['home', 'favorites', 'profile'].map((path) => (
-                  <li key={path} className="relative">
-                    <Link 
-                      to={`/${path}`} 
+          <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 ${
+            mobileMenuOpen 
+              ? 'block opacity-100' 
+              : 'hidden md:flex opacity-0 md:opacity-100'
+          }`} id="navbar-user">
+            <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 ${
+              darkMode 
+                ? 'bg-gray-800 md:bg-transparent border border-gray-700' 
+                : 'bg-white md:bg-transparent border border-gray-200 shadow-sm'
+            }`}>
+              {user ? (
+                <>
+                  {['home', 'favorites', 'profile'].map((path) => (
+                    <li key={path} className="relative">
+                      <Link 
+                        to={`/${path}`} 
+                        className={`block py-2 pl-3 pr-4 rounded md:p-0 transition-all duration-300 ${
+                          isActive(`/${path}`) 
+                            ? darkMode
+                              ? 'text-white md:text-blue-400'
+                              : 'text-white md:text-white font-semibold' 
+                            : darkMode
+                              ? 'text-gray-300 hover:bg-gray-700 hover:text-white md:hover:bg-transparent md:hover:text-blue-400'
+                              : 'text-blue-100 hover:bg-blue-700 hover:text-white md:hover:bg-transparent md:hover:text-white'
+                        }`}
+                        onClick={closeMenu}
+                      >
+                        {/* Mobile active background */}
+                        {isActive(`/${path}`) && (
+                          <div className={`absolute inset-0 rounded md:hidden ${
+                            darkMode 
+                              ? 'bg-gradient-to-r from-blue-500 to-purple-600' 
+                              : 'bg-gradient-to-r from-blue-700 to-blue-600'
+                          } -z-10`}></div>
+                        )}
+                        
+                        {/* Desktop underline effect */}
+                        <span className={`relative inline-block ${
+                          isActive(`/${path}`) ? 'after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white' : ''
+                        }`}>
+                          {path.charAt(0).toUpperCase() + path.slice(1)}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                  <li className="md:hidden">
+                    <button
+                      onClick={() => {
+                        closeMenu();
+                        handleLogout();
+                      }}
+                      className="relative block w-full text-left py-2 pl-3 pr-4 text-white rounded mt-2 overflow-hidden"
+                    >
+                      {/* Button background */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-600 -z-10"></div>
+                      
+                      {/* Button shine effect */}
+                      <div className="absolute inset-0 w-[200%] opacity-20 bg-gradient-to-r from-transparent via-white to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                      
+                      <span className="relative z-10">Logout</span>
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/login"
                       className={`block py-2 pl-3 pr-4 rounded md:p-0 transition-all duration-300 ${
-                        isActive(`/${path}`) 
+                        isActive('/login')
                           ? darkMode
                             ? 'text-white md:text-blue-400'
-                            : 'text-white md:text-white font-semibold' 
+                            : 'text-white md:text-white font-semibold'
                           : darkMode
                             ? 'text-gray-300 hover:bg-gray-700 hover:text-white md:hover:bg-transparent md:hover:text-blue-400'
                             : 'text-blue-100 hover:bg-blue-700 hover:text-white md:hover:bg-transparent md:hover:text-white'
                       }`}
                       onClick={closeMenu}
                     >
-                      {/* Mobile active background */}
-                      {isActive(`/${path}`) && (
-                        <div className={`absolute inset-0 rounded md:hidden ${
-                          darkMode 
-                            ? 'bg-gradient-to-r from-blue-500 to-purple-600' 
-                            : 'bg-gradient-to-r from-blue-700 to-blue-600'
-                        } -z-10`}></div>
-                      )}
-                      
-                      {/* Desktop underline effect */}
-                      <span className={`relative inline-block ${
-                        isActive(`/${path}`) ? 'after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white' : ''
-                      }`}>
-                        {path.charAt(0).toUpperCase() + path.slice(1)}
-                      </span>
+                      Login
                     </Link>
                   </li>
-                ))}
-                <li className="md:hidden">
-                  <button
-                    onClick={() => {
-                      closeMenu();
-                      handleLogout();
-                    }}
-                    className="relative block w-full text-left py-2 pl-3 pr-4 text-white rounded mt-2 overflow-hidden"
-                  >
-                    {/* Button background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-600 -z-10"></div>
-                    
-                    {/* Button shine effect */}
-                    <div className="absolute inset-0 w-[200%] opacity-20 bg-gradient-to-r from-transparent via-white to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    
-                    <span className="relative z-10">Logout</span>
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
+                  <li>
+                    <Link
+                      to="/register"
+                      className={`block py-2 pl-3 pr-4 rounded md:p-0 transition-all duration-300 ${
+                        isActive('/register')
+                          ? darkMode
+                            ? 'text-white md:text-blue-400'
+                            : 'text-white md:text-white font-semibold'
+                          : darkMode
+                            ? 'text-gray-300 hover:bg-gray-700 hover:text-white md:hover:bg-transparent md:hover:text-blue-400'
+                            : 'text-blue-100 hover:bg-blue-700 hover:text-white md:hover:bg-transparent md:hover:text-white'
+                      }`}
+                      onClick={closeMenu}
+                    >
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
         </div>
         
         {/* Bottom nav bar divider with glow effect */}

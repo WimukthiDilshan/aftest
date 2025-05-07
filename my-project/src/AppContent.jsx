@@ -27,6 +27,8 @@ function AppContent() {
   const [favorites, setFavorites] = useState([]);
   const [populationRange, setPopulationRange] = useState({ min: 0, max: 1500000000 });
   const [sortBy, setSortBy] = useState('name');
+  const [compareMode, setCompareMode] = useState(false);
+  const [countriesToCompare, setCountriesToCompare] = useState([]);
 
   useEffect(() => {
     fetchAllCountries();
@@ -145,6 +147,60 @@ function AppContent() {
     setFilteredCountries(filtered);
   };
 
+  const toggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    if (compareMode) {
+      setCountriesToCompare([]);
+    }
+  };
+
+  const handleAddToCompare = (country) => {
+    if (countriesToCompare.length < 2) {
+      setCountriesToCompare([...countriesToCompare, country]);
+    }
+  };
+
+  const handleRemoveFromCompare = (countryCode) => {
+    setCountriesToCompare(countriesToCompare.filter(c => c.cca3 !== countryCode));
+  };
+
+  const applyCompareFilters = (index, filter) => {
+    if (!countries.length) return;
+    
+    let filtered = [...countries];
+    
+    // Apply region filter
+    if (filter.region) {
+      filtered = filtered.filter(country => country.region === filter.region);
+    }
+    
+    // Apply population filter
+    filtered = filtered.filter(country =>
+      country.population >= 0 &&
+      country.population <= filter.populationMax
+    );
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const sortField = filter.sort.startsWith('-') ? filter.sort.slice(1) : filter.sort;
+      const multiplier = filter.sort.startsWith('-') ? -1 : 1;
+      
+      if (sortField === 'name') {
+        return multiplier * a.name.common.localeCompare(b.name.common);
+      } else if (sortField === 'population') {
+        return multiplier * (a.population - b.population);
+      } else if (sortField === 'area') {
+        return multiplier * ((a.area || 0) - (b.area || 0));
+      }
+      return 0;
+    });
+    
+    // Update the filtered countries for the specific side
+    const newFilteredCountries = [...filteredCountries];
+    newFilteredCountries[index] = filtered;
+    setFilteredCountries(newFilteredCountries);
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
       <Navbar darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
@@ -168,9 +224,28 @@ function AppContent() {
                       }} 
                     />
                   </div>
+                  <div className="flex justify-between items-center mb-6">
+                    <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {compareMode ? 'Compare Countries' : 'All Countries'}
+                    </h1>
+                    <button
+                      onClick={toggleCompareMode}
+                      className={`px-4 py-2 rounded-lg transition-colors ${
+                        compareMode
+                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                          : darkMode 
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                      }`}
+                    >
+                      {compareMode ? 'Exit Compare Mode' : 'Compare Countries'}
+                    </button>
+                  </div>
                   <div className="flex flex-col md:flex-row md:space-x-4 pb-8">
                     <div className="w-full md:w-2/3 mb-4 md:mb-0">
-                      <SearchBar onSearch={handleSearch} searchTerm={searchTerm} darkMode={darkMode} />
+                      {!compareMode && (
+                        <SearchBar onSearch={handleSearch} searchTerm={searchTerm} darkMode={darkMode} />
+                      )}
                     </div>
                     <div className="w-full md:w-1/3">
                       <Filter
@@ -182,6 +257,9 @@ function AppContent() {
                         sortBy={sortBy}
                         onSortChange={handleSort}
                         darkMode={darkMode}
+                        compareMode={compareMode}
+                        countriesToCompare={countriesToCompare}
+                        onCountryFilterChange={applyCompareFilters}
                       />
                     </div>
                   </div>
@@ -200,6 +278,10 @@ function AppContent() {
                       darkMode={darkMode}
                       favorites={favorites}
                       onToggleFavorite={toggleFavorite}
+                      compareMode={compareMode}
+                      countriesToCompare={countriesToCompare}
+                      onAddToCompare={handleAddToCompare}
+                      onRemoveFromCompare={handleRemoveFromCompare}
                     />
                   )}
                 </div>

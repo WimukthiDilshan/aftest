@@ -6,10 +6,10 @@ const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
 export const api = {
   // User endpoints
   users: {
-    login: `${baseUrl}/api/users/login`,
-    register: `${baseUrl}/api/users`,
-    profile: `${baseUrl}/api/users/profile`,
-    updateProfile: `${baseUrl}/api/users/profile`,
+    login: `${baseUrl}/users/login`,
+    register: `${baseUrl}/users`,
+    profile: `${baseUrl}/users/profile`,
+    updateProfile: `${baseUrl}/users/profile`,
   },
 };
 

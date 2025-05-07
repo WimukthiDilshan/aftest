@@ -23,6 +23,7 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     fetchAllCountries();
@@ -31,7 +32,26 @@ function AppContent() {
     if (savedDarkMode !== null) {
       setDarkMode(JSON.parse(savedDarkMode));
     }
+    // Load favorites from localStorage
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
   }, []);
+
+  // Save favorites to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (country) => {
+    const isFavorite = favorites.some(fav => fav.cca3 === country.cca3);
+    if (isFavorite) {
+      setFavorites(favorites.filter(fav => fav.cca3 !== country.cca3));
+    } else {
+      setFavorites([...favorites, country]);
+    }
+  };
 
   const fetchAllCountries = async () => {
     try {
@@ -111,6 +131,8 @@ function AppContent() {
                       countries={filteredCountries}
                       onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
                       darkMode={darkMode}
+                      favorites={favorites}
+                      onToggleFavorite={toggleFavorite}
                     />
                   )}
                 </div>
@@ -124,6 +146,8 @@ function AppContent() {
                 <CountryDetail
                   onBack={() => navigate('/home')}
                   darkMode={darkMode}
+                  favorites={favorites}
+                  onToggleFavorite={toggleFavorite}
                 />
               </ProtectedRoute>
             }

@@ -105,6 +105,15 @@ function AppContent() {
               <ProtectedRoute>
                 <div>
                   <SiteDescription />
+                  <div className="mb-8">
+                    <WorldMap 
+                      darkMode={darkMode} 
+                      onRegionClick={(region) => {
+                        setSelectedRegion(region.name);
+                        handleRegionFilter(region.name);
+                      }} 
+                    />
+                  </div>
                   <div className="flex flex-col md:flex-row md:space-x-4 pb-8">
                     <div className="w-full md:w-2/3 mb-4 md:mb-0">
                       <SearchBar onSearch={handleSearch} searchTerm={searchTerm} darkMode={darkMode} />

@@ -13,7 +13,7 @@ const Profile = () => {
         setLoading(true);
         setError('');
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
+        const response = await fetch('http://localhost:5000/api/users/profile', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -58,41 +58,41 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div className="px-4 py-5 sm:px-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-              Profile Information
-            </h3>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
+        <div className="px-6 py-8">
+          <div className="flex items-center justify-center">
+            <div className="h-24 w-24 rounded-full bg-blue-500 flex items-center justify-center text-white text-4xl font-bold">
+              {profile?.name?.charAt(0).toUpperCase()}
+            </div>
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700">
-            <dl>
-              <div className="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Name
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                  {profile?.name}
-                </dd>
-              </div>
-              <div className="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Username
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                  {profile?.username}
-                </dd>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Email
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                  {profile?.email}
-                </dd>
-              </div>
-            </dl>
+          
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+            {profile?.name}
+          </h2>
+          
+          <div className="mt-2 text-center text-xl text-gray-500 dark:text-gray-400">
+            @{profile?.username}
+          </div>
+          
+          <div className="mt-6 space-y-4">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Email Address
+              </p>
+              <p className="mt-1 text-lg text-gray-900 dark:text-white">
+                {profile?.email}
+              </p>
+            </div>
+            
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Account Created
+              </p>
+              <p className="mt-1 text-lg text-gray-900 dark:text-white">
+                {new Date(profile?.createdAt).toLocaleDateString()}
+              </p>
+            </div>
           </div>
         </div>
       </div>

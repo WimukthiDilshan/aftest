@@ -14,14 +14,8 @@ connectDB();
 // Initialize Express
 const app = express();
 
-// CORS configuration
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://your-frontend-url.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
 // Middleware
+app.use(cors());
 app.use(express.json()); // Parse JSON bodies
 
 // Routes

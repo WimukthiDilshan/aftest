@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../config/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const Register = () => {
     
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch(api.users.register, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,7 +60,6 @@ const Register = () => {
       }
       
       // On successful registration, redirect to login page
-      // Do not store user info - that will happen after login
       navigate('/login');
       
     } catch (error) {
@@ -162,7 +162,7 @@ const Register = () => {
               <label htmlFor="confirmPassword" className="text-gray-500 dark:text-gray-400">Confirm password</label>
             </div>
 
-            <div className="mt-8">
+            <div>
               <button
                 type="submit"
                 disabled={loading}
@@ -176,11 +176,11 @@ const Register = () => {
                     </svg>
                     Creating account...
                   </span>
-                ) : 'Create Account'}
+                ) : 'Create account'}
               </button>
             </div>
             
-            <div className="flex items-center justify-center mt-6">
+            <div className="flex items-center justify-center">
               <div className="text-sm">
                 <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 hover:underline transition-all">
                   Already have an account? Sign in

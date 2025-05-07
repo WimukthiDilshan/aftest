@@ -4,8 +4,8 @@ function CountryCard({ country, onClick, darkMode, isFavorite, onToggleFavorite,
     e.preventDefault();
     // Stop the event from bubbling up to parent elements
     e.stopPropagation();
-    // Call the toggle favorite function with the event
-    onToggleFavorite(e);
+    // Call the toggle favorite function with the country object
+    onToggleFavorite(country);
   }
 
   // Calculate animation delay based on card index for staggered effect

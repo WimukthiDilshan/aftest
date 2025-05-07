@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../config/api';
+import { useAuth } from '../context/AuthContext';
 
-const Login = ({ onLogin }) => {
+const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     identifier: '',
     password: ''
@@ -53,7 +56,8 @@ const Login = ({ onLogin }) => {
       }
       
       setSuccess(true);
-      onLogin(data);
+      login(data);
+      navigate('/home');
       
     } catch (error) {
       console.error('Login error:', error);

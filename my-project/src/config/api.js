@@ -1,12 +1,15 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// Remove trailing slash if present
+const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+
 export const api = {
   // User endpoints
   users: {
-    login: `${API_URL}/users/login`,
-    register: `${API_URL}/users/register`,
-    profile: `${API_URL}/users/profile`,
-    updateProfile: `${API_URL}/users/profile`,
+    login: `${baseUrl}/api/users/login`,
+    register: `${baseUrl}/api/users/register`,
+    profile: `${baseUrl}/api/users/profile`,
+    updateProfile: `${baseUrl}/api/users/profile`,
   },
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../config/api';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -13,10 +14,12 @@ const Profile = () => {
         setLoading(true);
         setError('');
         
-        const response = await fetch('http://localhost:5000/api/users/profile', {
+        const response = await fetch(api.users.profile, {
           headers: {
-            Authorization: `Bearer ${user.token}`
-          }
+            Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
         });
         
         const data = await response.json();
@@ -27,7 +30,8 @@ const Profile = () => {
         
         setProfile(data);
       } catch (error) {
-        setError(error.message);
+        console.error('Profile fetch error:', error);
+        setError(error.message || 'Failed to fetch profile');
       } finally {
         setLoading(false);
       }

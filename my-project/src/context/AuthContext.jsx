@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { api } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -16,10 +17,12 @@ export const AuthProvider = ({ children }) => {
           const parsedUser = JSON.parse(userInfo);
           
           // Verify token is still valid by making a request to profile endpoint
-          const response = await fetch('http://localhost:5000/api/users/profile', {
+          const response = await fetch(api.users.profile, {
             headers: {
-              Authorization: `Bearer ${parsedUser.token}`
-            }
+              Authorization: `Bearer ${parsedUser.token}`,
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include'
           });
           
           if (response.ok) {
@@ -31,6 +34,8 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
+        // Clear invalid user data
+        localStorage.removeItem('userInfo');
       } finally {
         setLoading(false);
       }

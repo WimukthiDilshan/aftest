@@ -13,9 +13,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import WorldMap from './components/WorldMap';
 import SiteDescription from './components/SiteDescription';
 import { useAuth } from './context/AuthContext';
+import { api } from './config/api';
 
 function AppContent() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [countries, setCountries] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,6 +25,8 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
     fetchAllCountries();
@@ -32,6 +36,12 @@ function AppContent() {
       setDarkMode(JSON.parse(savedDarkMode));
     }
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchFavorites();
+    }
+  }, [user]);
 
   const fetchAllCountries = async () => {
     try {
@@ -46,6 +56,54 @@ function AppContent() {
       console.error('Error fetching countries:', error);
       setError(error.message);
       setLoading(false);
+    }
+  };
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch(api.users.getFavorites, {
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch favorites');
+      const data = await response.json();
+      setFavorites(data.favorites);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+    }
+  };
+
+  const handleToggleFavorite = async (country) => {
+    try {
+      const isFavorite = favorites.some(fav => fav.cca3 === country.cca3);
+      
+      if (isFavorite) {
+        // Remove from favorites
+        const response = await fetch(api.users.removeFavorite(country.cca3), {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        if (!response.ok) throw new Error('Failed to remove favorite');
+      } else {
+        // Add to favorites
+        const response = await fetch(api.users.addFavorite, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          },
+          body: JSON.stringify({ country })
+        });
+        if (!response.ok) throw new Error('Failed to add favorite');
+      }
+
+      // Refresh favorites
+      await fetchFavorites();
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
 
@@ -69,6 +127,11 @@ function AppContent() {
     }
     const filtered = countries.filter(country => country.region === region);
     setFilteredCountries(filtered);
+  };
+
+  const handleCountryClick = (country) => {
+    setSelectedCountry(country);
+    navigate(`/country/${country.cca3}`);
   };
 
   return (
@@ -109,8 +172,10 @@ function AppContent() {
                   ) : (
                     <CountryList
                       countries={filteredCountries}
-                      onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
+                      onCountryClick={handleCountryClick}
                       darkMode={darkMode}
+                      favorites={favorites}
+                      onToggleFavorite={handleToggleFavorite}
                     />
                   )}
                 </div>
@@ -122,9 +187,33 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <CountryDetail
+                  country={selectedCountry}
                   onBack={() => navigate('/home')}
                   darkMode={darkMode}
+                  isFavorite={selectedCountry ? favorites.some(fav => fav.cca3 === selectedCountry.cca3) : false}
+                  onToggleFavorite={() => selectedCountry && handleToggleFavorite(selectedCountry)}
                 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <ProtectedRoute>
+                <div>
+                  <h1 className="text-2xl font-bold mb-6">Favorite Countries</h1>
+                  {favorites.length === 0 ? (
+                    <p className="text-gray-500">No favorite countries yet.</p>
+                  ) : (
+                    <CountryList
+                      countries={favorites}
+                      onCountryClick={handleCountryClick}
+                      darkMode={darkMode}
+                      favorites={favorites}
+                      onToggleFavorite={handleToggleFavorite}
+                    />
+                  )}
+                </div>
               </ProtectedRoute>
             }
           />

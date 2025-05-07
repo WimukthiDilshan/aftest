@@ -126,4 +126,90 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile }; 
+// @desc    Add a country to favorites
+// @route   POST /api/users/favorites
+// @access  Private
+const addFavorite = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { country } = req.body;
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if country is already in favorites
+    const isFavorite = user.favorites.some(fav => fav.cca3 === country.cca3);
+    if (isFavorite) {
+      return res.status(400).json({ message: 'Country already in favorites' });
+    }
+
+    // Add country to favorites
+    user.favorites.push(country);
+    await user.save();
+
+    res.status(200).json({ message: 'Country added to favorites', favorites: user.favorites });
+  } catch (error) {
+    console.error('Add favorite error:', error);
+    res.status(400).json({ 
+      message: 'Failed to add favorite',
+      error: error.toString()
+    });
+  }
+};
+
+// @desc    Remove a country from favorites
+// @route   DELETE /api/users/favorites/:cca3
+// @access  Private
+const removeFavorite = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { cca3 } = req.params;
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Remove country from favorites
+    user.favorites = user.favorites.filter(fav => fav.cca3 !== cca3);
+    await user.save();
+
+    res.status(200).json({ message: 'Country removed from favorites', favorites: user.favorites });
+  } catch (error) {
+    console.error('Remove favorite error:', error);
+    res.status(400).json({ 
+      message: 'Failed to remove favorite',
+      error: error.toString()
+    });
+  }
+};
+
+// @desc    Get user's favorite countries
+// @route   GET /api/users/favorites
+// @access  Private
+const getFavorites = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ favorites: user.favorites });
+  } catch (error) {
+    console.error('Get favorites error:', error);
+    res.status(400).json({ 
+      message: 'Failed to get favorites',
+      error: error.toString()
+    });
+  }
+};
+
+module.exports = { 
+  registerUser, 
+  loginUser, 
+  getUserProfile,
+  addFavorite,
+  removeFavorite,
+  getFavorites
+}; 

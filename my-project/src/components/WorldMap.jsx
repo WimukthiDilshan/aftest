@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const WorldMap = ({ darkMode, onRegionClick }) => {
+const WorldMap = ({ darkMode, countries, onCountryClick }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -73,9 +73,10 @@ const WorldMap = ({ darkMode, onRegionClick }) => {
       }
     }, 1000);
     
-    // If parent component provided an onClick handler, call it with the region data
-    if (onRegionClick) {
-      onRegionClick(region);
+    // Filter countries by region and call onCountryClick with the first country
+    const regionCountries = countries.filter(country => country.region === region.name);
+    if (regionCountries.length > 0 && onCountryClick) {
+      onCountryClick(regionCountries[0]);
     }
     
     // Reset clicked state after animation completes but keep the active region
@@ -199,7 +200,7 @@ const WorldMap = ({ darkMode, onRegionClick }) => {
               stroke={darkMode ? '#3B82F6' : '#60A5FA'}
               strokeWidth={darkMode ? "0.5" : "1.5"}
               className="transition-all duration-300"
-              filter={darkMode ? "url(#darkModeEnhance)" : "none"}
+              style={{ filter: darkMode ? 'url(#darkModeEnhance)' : 'none' }}
             />
             
             {/* Overlay for the 3D effect */}

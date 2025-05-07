@@ -127,13 +127,22 @@ function AppContent() {
                       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
                     </div>
                   ) : (
-                    <CountryList
-                      countries={filteredCountries}
-                      onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
-                      darkMode={darkMode}
-                      favorites={favorites}
-                      onToggleFavorite={toggleFavorite}
-                    />
+                    <>
+                      <div className="mb-8">
+                        <WorldMap 
+                          countries={countries}
+                          onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
+                          darkMode={darkMode}
+                        />
+                      </div>
+                      <CountryList
+                        countries={filteredCountries}
+                        onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
+                        darkMode={darkMode}
+                        favorites={favorites}
+                        onToggleFavorite={toggleFavorite}
+                      />
+                    </>
                   )}
                 </div>
               </ProtectedRoute>

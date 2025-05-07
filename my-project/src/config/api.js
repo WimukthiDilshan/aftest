@@ -7,7 +7,7 @@ export const api = {
   // User endpoints
   users: {
     login: `${baseUrl}/api/users/login`,
-    register: `${baseUrl}/api/users/register`,
+    register: `${baseUrl}/api/users`,
     profile: `${baseUrl}/api/users/profile`,
     updateProfile: `${baseUrl}/api/users/profile`,
   },

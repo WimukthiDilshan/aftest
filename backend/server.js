@@ -16,9 +16,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL // Your frontend Vercel URL
-    : 'http://localhost:5173', // Your local frontend URL
+  origin: '*', // Allow all origins temporarily for debugging
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -27,6 +25,13 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json()); // Parse JSON bodies
+
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  next();
+});
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -44,4 +49,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('Frontend URL:', process.env.FRONTEND_URL);
 }); 

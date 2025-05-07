@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
- import { api } from '../config/api';
+import { api } from '../config/api';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -32,28 +32,32 @@ const Login = ({ onLogin }) => {
     
     try {
       setLoading(true);
+      console.log('Attempting login to:', api.users.login);
+      
       const response = await fetch(api.users.login, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ email: identifier, password })
       });
       
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (!response.ok) {
         throw new Error(data.message || 'Failed to login');
       }
       
-      // The redirection will be handled by the AuthContext after we call onLogin
-      
-      // Call the onLogin handler with user data
       setSuccess(true);
       onLogin(data);
       
     } catch (error) {
-      setError(error.message);
+      console.error('Login error:', error);
+      setError(error.message || 'Failed to connect to the server');
     } finally {
       setLoading(false);
     }

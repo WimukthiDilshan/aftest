@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import CountryList from './components/CountryList';
 import SearchBar from './components/SearchBar';
 import Filter from './components/Filter';
@@ -24,6 +24,7 @@ function AppContent() {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
     fetchAllCountries();
@@ -91,6 +92,34 @@ function AppContent() {
     setFilteredCountries(filtered);
   };
 
+  const handleCountryClick = (country) => {
+    setSelectedCountry(country);
+    navigate(`/country/${country.cca3}`);
+  };
+
+  const handleBack = () => {
+    setSelectedCountry(null);
+    navigate('/home');
+  };
+
+  const getCountryByCode = async (code) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
+      if (!response.ok) throw new Error('Country not found');
+      const data = await response.json();
+      const countryData = Array.isArray(data) ? data[0] : data;
+      setSelectedCountry(countryData);
+      navigate(`/country/${code}`);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching country details:', error);
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
       <Navbar darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
@@ -131,13 +160,13 @@ function AppContent() {
                       <div className="mb-8">
                         <WorldMap 
                           countries={countries}
-                          onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
+                          onCountryClick={handleCountryClick}
                           darkMode={darkMode}
                         />
                       </div>
                       <CountryList
                         countries={filteredCountries}
-                        onCountryClick={(country) => navigate(`/country/${country.cca3}`)}
+                        onCountryClick={handleCountryClick}
                         darkMode={darkMode}
                         favorites={favorites}
                         onToggleFavorite={toggleFavorite}
@@ -152,12 +181,20 @@ function AppContent() {
             path="/country/:code"
             element={
               <ProtectedRoute>
-                <CountryDetail
-                  onBack={() => navigate('/home')}
-                  darkMode={darkMode}
-                  favorites={favorites}
-                  onToggleFavorite={toggleFavorite}
-                />
+                {selectedCountry ? (
+                  <CountryDetail
+                    country={selectedCountry}
+                    onBack={handleBack}
+                    onBorderClick={getCountryByCode}
+                    darkMode={darkMode}
+                    isFavorite={favorites.some(fav => fav.cca3 === selectedCountry.cca3)}
+                    onToggleFavorite={() => toggleFavorite(selectedCountry)}
+                  />
+                ) : (
+                  <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+                  </div>
+                )}
               </ProtectedRoute>
             }
           />

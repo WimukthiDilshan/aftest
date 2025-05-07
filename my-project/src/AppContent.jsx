@@ -12,6 +12,7 @@ import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import WorldMap from './components/WorldMap';
 import SiteDescription from './components/SiteDescription';
+import Favorites from './components/Favorites';
 import { useAuth } from './context/AuthContext';
 
 function AppContent() {
@@ -166,6 +167,18 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Profile darkMode={darkMode} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <ProtectedRoute>
+                <Favorites
+                  darkMode={darkMode}
+                  favorites={favorites}
+                  onToggleFavorite={toggleFavorite}
+                />
               </ProtectedRoute>
             }
           />

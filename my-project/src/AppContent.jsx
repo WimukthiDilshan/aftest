@@ -25,6 +25,8 @@ function AppContent() {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [populationRange, setPopulationRange] = useState({ min: 0, max: 1500000000 });
+  const [sortBy, setSortBy] = useState('name');
 
   useEffect(() => {
     fetchAllCountries();
@@ -92,6 +94,57 @@ function AppContent() {
     setFilteredCountries(filtered);
   };
 
+  const handlePopulationFilter = (range) => {
+    setPopulationRange(range);
+    applyFilters(searchTerm, selectedRegion, range, sortBy);
+  };
+
+  const handleSort = (sort) => {
+    setSortBy(sort);
+    applyFilters(searchTerm, selectedRegion, populationRange, sort);
+  };
+
+  const applyFilters = (search, region, population, sort) => {
+    let filtered = [...countries];
+
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(country =>
+        country.name.common.toLowerCase().includes(searchLower) ||
+        country.name.official.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply region filter
+    if (region) {
+      filtered = filtered.filter(country => country.region === region);
+    }
+
+    // Apply population filter
+    filtered = filtered.filter(country =>
+      country.population >= population.min &&
+      country.population <= population.max
+    );
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const sortField = sort.startsWith('-') ? sort.slice(1) : sort;
+      const multiplier = sort.startsWith('-') ? -1 : 1;
+
+      if (sortField === 'name') {
+        return multiplier * a.name.common.localeCompare(b.name.common);
+      } else if (sortField === 'population') {
+        return multiplier * (a.population - b.population);
+      } else if (sortField === 'area') {
+        return multiplier * ((a.area || 0) - (b.area || 0));
+      }
+      return 0;
+    });
+
+    setFilteredCountries(filtered);
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
       <Navbar darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
@@ -124,6 +177,10 @@ function AppContent() {
                         regions={Array.from(new Set(countries.map(country => country.region))).filter(Boolean)}
                         selectedRegion={selectedRegion}
                         onRegionChange={handleRegionFilter}
+                        populationRange={populationRange}
+                        onPopulationChange={handlePopulationFilter}
+                        sortBy={sortBy}
+                        onSortChange={handleSort}
                         darkMode={darkMode}
                       />
                     </div>

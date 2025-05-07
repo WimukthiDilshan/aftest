@@ -23,17 +23,20 @@ function AppContent() {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [populationRange, setPopulationRange] = useState({ min: 0, max: 1500000000 });
   const [sortBy, setSortBy] = useState('name');
 
   useEffect(() => {
     fetchAllCountries();
-    // Initialize dark mode
+    // Initialize dark mode - check localStorage first, default to true if not set
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode !== null) {
       setDarkMode(JSON.parse(savedDarkMode));
+    } else {
+      setDarkMode(true);
+      localStorage.setItem('darkMode', 'true');
     }
     // Load favorites from localStorage
     const savedFavorites = localStorage.getItem('favorites');
@@ -41,6 +44,21 @@ function AppContent() {
       setFavorites(JSON.parse(savedFavorites));
     }
   }, []);
+
+  // Save dark mode preference to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    // Apply dark mode class to body element
+    if (darkMode) {
+      document.body.classList.add('dark');
+      document.body.classList.add('bg-gray-900');
+      document.body.classList.remove('bg-gray-100');
+    } else {
+      document.body.classList.remove('dark');
+      document.body.classList.remove('bg-gray-900');
+      document.body.classList.add('bg-gray-100');
+    }
+  }, [darkMode]);
 
   // Save favorites to localStorage when they change
   useEffect(() => {
@@ -151,14 +169,14 @@ function AppContent() {
       <main className="container mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login darkMode={darkMode} />} />
+          <Route path="/register" element={<Register darkMode={darkMode} />} />
           <Route
             path="/home"
             element={
               <ProtectedRoute>
-                <div>
-                  <SiteDescription />
+                <div className={darkMode ? 'text-white' : 'text-gray-900'}>
+                  <SiteDescription darkMode={darkMode} />
                   <div className="mb-8">
                     <WorldMap 
                       darkMode={darkMode} 
@@ -186,7 +204,7 @@ function AppContent() {
                     </div>
                   </div>
                   {error ? (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <div className={`${darkMode ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-700'} border border-red-400 px-4 py-3 rounded mb-4`}>
                       <p>{error}</p>
                     </div>
                   ) : loading ? (

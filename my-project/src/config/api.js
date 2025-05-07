@@ -10,10 +10,6 @@ export const api = {
     register: `${baseUrl}/api/users/register`,
     profile: `${baseUrl}/api/users/profile`,
     updateProfile: `${baseUrl}/api/users/profile`,
-    // Favorite endpoints
-    addFavorite: `${baseUrl}/api/users/favorites`,
-    removeFavorite: (cca3) => `${baseUrl}/api/users/favorites/${cca3}`,
-    getFavorites: `${baseUrl}/api/users/favorites`
   },
 };
 

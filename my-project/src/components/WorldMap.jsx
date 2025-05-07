@@ -9,7 +9,7 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
   const [clickedRegion, setClickedRegion] = useState(null);
   const [activeRegion, setActiveRegion] = useState(null);
 
-  // Define regions with coordinates for the interactive map - adjusted position for Oceania and added Antarctica
+  // Define regions with coordinates for the interactive map
   const regions = [
     { id: 1, name: "North America", cx: "25%", cy: "35%", r: "12%", color: darkMode ? "#3B82F6" : "#2563EB", hoverColor: darkMode ? "#60A5FA" : "#3B82F6", 
       path: "M20,20 Q25,25 20,45 Q30,50 25,55 L35,50 Q40,40 30,30 L20,20" },
@@ -27,10 +27,6 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
       path: "M35,85 Q50,80 65,85 Q60,95 40,95 L35,85" }
   ];
 
-  // World map image URLs for both light and dark modes - updated with higher contrast image for dark mode
-  const worldMapLight = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Equirectangular_projection_SW.jpg/1024px-Equirectangular_projection_SW.jpg";
-  const worldMapDark = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/1024px-Blue_Marble_2002.png";
-  
   // Animation for the globe
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -60,19 +56,6 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
     setClickedRegion(region.id);
     setActiveRegion(region.id);
     
-    // Create a visual pulse effect at the click location
-    const pulseEffect = document.createElement('div');
-    pulseEffect.className = 'absolute w-16 h-16 rounded-full bg-white opacity-20 transform -translate-x-1/2 -translate-y-1/2 animate-ping';
-    pulseEffect.style.left = `${region.cx}`;
-    pulseEffect.style.top = `${region.cy}`;
-    
-    // Remove pulse effect after animation
-    setTimeout(() => {
-      if (pulseEffect.parentNode) {
-        pulseEffect.parentNode.removeChild(pulseEffect);
-      }
-    }, 1000);
-    
     // Filter countries by region and call onCountryClick with the first country
     const regionCountries = countries.filter(country => country.region === region.name);
     if (regionCountries.length > 0 && onCountryClick) {
@@ -84,20 +67,6 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
       setClickedRegion(null);
     }, 500);
   };
-
-  // Generate random stars for the background
-  const generateStars = (count) => {
-    return Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      cx: `${Math.random() * 100}%`,
-      cy: `${Math.random() * 100}%`,
-      r: Math.random() * 1.5 + 0.5,
-      opacity: Math.random() * 0.8 + 0.2,
-      animationDelay: `${Math.random() * 5}s`
-    }));
-  };
-
-  const stars = generateStars(100);
 
   return (
     <div 
@@ -116,30 +85,6 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
         }}
       ></div>
 
-      {/* Stars background (only in dark mode) */}
-      {darkMode && (
-        <svg className="absolute inset-0 w-full h-full z-0">
-          {stars.map(star => (
-            <circle
-              key={star.id}
-              cx={star.cx}
-              cy={star.cy}
-              r={star.r}
-              fill="white"
-              opacity={star.opacity}
-              className="animate-pulse"
-              style={{ animationDuration: '3s', animationDelay: star.animationDelay }}
-            />
-          ))}
-        </svg>
-      )}
-
-      {/* Preload images for map texture patterns */}
-      <div className="hidden">
-        <img src={worldMapLight} onLoad={() => setMapLoaded(true)} alt="World Map Light" />
-        <img src={worldMapDark} onLoad={() => setMapLoaded(true)} alt="World Map Dark" />
-      </div>
-
       {/* Main globe container */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div 
@@ -149,191 +94,68 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
             transformStyle: 'preserve-3d'
           }}
         >
-          {/* 3D Globe SVG with realistic map texture */}
+          {/* 3D Globe SVG */}
           <svg 
             viewBox="0 0 100 100" 
             className="absolute inset-0 w-full h-full z-10"
             style={{ filter: `drop-shadow(0 4px 20px ${darkMode ? 'rgba(79, 70, 229, 0.4)' : 'rgba(59, 130, 246, 0.3)'})` }}
           >
-            {/* Define patterns for the earth texture */}
-            <defs>
-              <pattern id="worldMapPattern" patternUnits="userSpaceOnUse" width="100" height="100">
-                <image 
-                  href={darkMode ? worldMapDark : worldMapLight} 
-                  width="100" 
-                  height="100" 
-                  preserveAspectRatio="xMidYMid slice"
-                  opacity="1"
-                />
-              </pattern>
-              
-              {/* Overlay gradient for blending with the background */}
-              <radialGradient id="globeGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                <stop offset="0%" stopColor={darkMode ? "rgba(30, 41, 59, 0)" : "rgba(239, 246, 255, 0)"} />
-                <stop offset="85%" stopColor={darkMode ? "rgba(30, 41, 59, 0)" : "rgba(239, 246, 255, 0)"} />
-                <stop offset="100%" stopColor={darkMode ? "rgba(30, 41, 59, 0.3)" : "rgba(239, 246, 255, 0.5)"} />
-              </radialGradient>
-              
-              {/* Color adjustment filter for dark mode */}
-              <filter id="darkModeEnhance">
-                <feColorMatrix 
-                  type="matrix" 
-                  values="1.2 0 0 0 0
-                          0 1.2 0 0 0
-                          0 0 1.2 0 0
-                          0 0 0 1 0"
-                />
-                <feComponentTransfer>
-                  <feFuncR type="linear" slope="1.2" intercept="0" />
-                  <feFuncG type="linear" slope="1.2" intercept="0" />
-                  <feFuncB type="linear" slope="1.2" intercept="0" />
-                </feComponentTransfer>
-              </filter>
-            </defs>
-
-            {/* Base circle for the globe with map texture */}
+            {/* Base circle for the globe */}
             <circle 
               cx="50%" 
               cy="50%" 
               r="45%" 
-              fill="url(#worldMapPattern)" 
+              fill={darkMode ? "#1E293B" : "#E2E8F0"}
               stroke={darkMode ? '#3B82F6' : '#60A5FA'}
               strokeWidth={darkMode ? "0.5" : "1.5"}
               className="transition-all duration-300"
-              style={{ filter: darkMode ? 'url(#darkModeEnhance)' : 'none' }}
-            />
-            
-            {/* Overlay for the 3D effect */}
-            <circle 
-              cx="50%" 
-              cy="50%" 
-              r="45%" 
-              fill="url(#globeGradient)" 
-              className="transition-all duration-300"
             />
 
-            {/* Globe grid lines (reduced opacity for the realistic map) */}
-            <g opacity={darkMode ? "0.4" : "0.6"}>
-              {/* Latitude lines */}
-              {[15, 30, 45, 60, 75].map(angle => (
-                <ellipse 
-                  key={`lat-${angle}`}
-                  cx="50%" 
-                  cy="50%" 
-                  rx="45%" 
-                  ry={`${45 * Math.cos(angle * Math.PI / 180)}%`}
-                  fill="none"
-                  stroke={darkMode ? '#8BBAFF' : '#93C5FD'}
-                  strokeWidth={darkMode ? "0.3" : "0.8"}
-                  strokeDasharray="1,1"
-                />
-              ))}
-              
-              {/* Longitude lines */}
-              {Array.from({ length: 12 }).map((_, i) => (
-                <line 
-                  key={`long-${i}`}
-                  x1="50%" 
-                  y1="5%" 
-                  x2="50%" 
-                  y2="95%"
-                  stroke={darkMode ? '#8BBAFF' : '#93C5FD'}
-                  strokeWidth={darkMode ? "0.3" : "0.8"}
-                  strokeDasharray="1,1"
-                  transform={`rotate(${i * 30} 50 50)`}
-                />
-              ))}
-            </g>
-
-            {/* Interactive regions with fixed color values instead of dynamic classes */}
+            {/* Interactive regions */}
             {regions.map(region => (
-              <g key={region.id} 
-                 onMouseEnter={() => setHighlightedRegion(region.id)}
-                 onMouseLeave={() => setHighlightedRegion(null)}
-                 onClick={() => handleRegionClick(region)}
-                 className="cursor-pointer">
-                {/* Visible circle for region */}
-                <circle
-                  cx={region.cx}
-                  cy={region.cy}
-                  r={region.r}
-                  fill={region.color}
-                  opacity={highlightedRegion === region.id ? 0.6 : activeRegion === region.id ? 0.5 : 0.25}
-                  stroke={activeRegion === region.id ? "white" : region.color}
-                  strokeWidth={activeRegion === region.id ? "1" : "0.5"}
-                  className={`transition-all duration-300 ${clickedRegion === region.id ? 'animate-ping' : ''}`}
-                />
-                
-                {/* Continent shape path for better click detection */}
+              <g
+                key={region.id}
+                onClick={() => handleRegionClick(region)}
+                className="cursor-pointer transition-all duration-300"
+                style={{
+                  transform: `translate(${mousePosition.x * 10 - 5}px, ${mousePosition.y * 10 - 5}px)`,
+                  filter: `drop-shadow(0 0 8px ${region.color})`
+                }}
+              >
                 <path
                   d={region.path}
                   fill={region.color}
-                  opacity={highlightedRegion === region.id ? "0.2" : activeRegion === region.id ? "0.15" : "0.1"}
-                  className="pointer-events-auto"
-                  stroke={highlightedRegion === region.id || activeRegion === region.id ? "white" : "transparent"}
-                  strokeWidth={activeRegion === region.id ? "1" : "0.5"}
+                  stroke={darkMode ? '#1E293B' : '#E2E8F0'}
+                  strokeWidth="0.5"
+                  className={`transition-all duration-300 ${
+                    clickedRegion === region.id ? 'animate-pulse' : ''
+                  }`}
+                  style={{
+                    opacity: activeRegion === region.id ? 0.8 : 0.6,
+                    transform: `scale(${highlightedRegion === region.id ? 1.05 : 1})`
+                  }}
+                  onMouseEnter={() => setHighlightedRegion(region.id)}
+                  onMouseLeave={() => setHighlightedRegion(null)}
                 />
-                
-                {/* Invisible larger clickable area around the region */}
-                <circle
-                  cx={region.cx}
-                  cy={region.cy}
-                  r={`${parseFloat(region.r) * 1.8}%`}
-                  fill="transparent"
-                  className="pointer-events-auto"
-                />
-                
-                {/* Pulse effect for hover interaction */}
-                {(highlightedRegion === region.id || activeRegion === region.id) && (
-                  <circle
-                    cx={region.cx}
-                    cy={region.cy}
-                    r={region.r}
-                    fill="none"
-                    stroke="white" 
-                    strokeWidth="0.8"
-                    opacity="0.5"
-                    className="animate-ping"
-                    style={{ animationDuration: '1.5s' }}
-                  />
-                )}
-                
-                {/* Display name on hover or when active */}
-                {(highlightedRegion === region.id || activeRegion === region.id) && (
-                  <text
-                    x={region.cx}
-                    y={region.cy}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="white"
-                    fontSize={activeRegion === region.id ? "4.5" : "4"}
-                    fontWeight="bold"
-                    className="pointer-events-none"
-                    style={{ textShadow: '0 0 3px black, 0 0 2px black' }}
-                  >
-                    {region.name}
-                  </text>
-                )}
-                
-                {/* "Click here" tooltip for better discoverability */}
-                {highlightedRegion === region.id && activeRegion !== region.id && (
-                  <text
-                    x={region.cx}
-                    y={`calc(${region.cy} + 6%)`}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="white"
-                    fontSize="2.5"
-                    className="pointer-events-none animate-pulse"
-                    style={{ textShadow: '0 0 2px black' }}
-                  >
-                    Click to filter
-                  </text>
-                )}
+                <text
+                  x={region.cx}
+                  y={region.cy}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className={`text-xs font-bold transition-all duration-300 ${
+                    darkMode ? 'fill-white' : 'fill-gray-900'
+                  }`}
+                  style={{
+                    opacity: highlightedRegion === region.id ? 1 : 0,
+                    transform: `translateY(${highlightedRegion === region.id ? '-20px' : '0'})`
+                  }}
+                >
+                  {region.name}
+                </text>
               </g>
             ))}
 
-            {/* Equator highlight */}
+            {/* Equator line */}
             <ellipse 
               cx="50%" 
               cy="50%" 
@@ -344,91 +166,8 @@ const WorldMap = ({ darkMode, countries, onCountryClick }) => {
               strokeWidth="0.8"
               opacity="0.8"
             />
-
-            {/* Animated glow pulse */}
-            <circle 
-              cx="50%" 
-              cy="50%" 
-              r="45%" 
-              fill="none"
-              stroke={darkMode ? '#3B82F6' : '#60A5FA'}
-              strokeWidth="0.8"
-              className="animate-ping"
-              style={{ animationDuration: '3s' }}
-              opacity="0.3"
-            />
-            
-            {/* Light reflection overlay for 3D effect */}
-            <ellipse 
-              cx="40%" 
-              cy="40%" 
-              rx="30%" 
-              ry="20%"
-              fill="white"
-              opacity={darkMode ? "0.08" : "0.1"}
-            />
           </svg>
-
-          {/* Floating particles */}
-          <div className="absolute inset-0 pointer-events-none">
-            {Array.from({ length: 15 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  width: `${Math.random() * 4 + 2}px`,
-                  height: `${Math.random() * 4 + 2}px`,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  opacity: 0.4,
-                  backgroundColor: darkMode ? '#60A5FA' : '#3B82F6',
-                  animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out ${Math.random() * 5}s, pulse 3s infinite ease-in-out ${Math.random() * 3}s`,
-                  boxShadow: `0 0 ${Math.random() * 5 + 5}px ${darkMode ? 'rgba(96, 165, 250, 0.5)' : 'rgba(59, 130, 246, 0.3)'}`
-                }}
-              ></div>
-            ))}
-          </div>
         </div>
-      </div>
-
-      {/* Region information panel with clickable action button */}
-      <div 
-        className={`absolute bottom-4 left-0 right-0 mx-auto w-3/4 md:w-2/3 lg:w-1/2 p-3 rounded-lg z-20 backdrop-blur-md transition-all duration-300 ${
-          darkMode 
-            ? 'bg-gray-800/70 text-white' 
-            : 'bg-white/90 text-gray-800 shadow-lg border border-gray-200'
-        } transform ${highlightedRegion ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
-      >
-        {highlightedRegion && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div 
-                className="w-6 h-6 rounded-full mr-2" 
-                style={{ 
-                  backgroundColor: regions.find(r => r.id === highlightedRegion)?.color 
-                }}
-              ></div>
-              <div>
-                <h3 className="font-bold text-base">
-                  {regions.find(r => r.id === highlightedRegion)?.name}
-                </h3>
-                <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Click to explore countries in this region
-                </p>
-              </div>
-            </div>
-            <button 
-              className={`px-3 py-1 text-xs font-medium rounded-md ${
-                darkMode 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              } transition-colors duration-200`}
-              onClick={() => handleRegionClick(regions.find(r => r.id === highlightedRegion))}
-            >
-              View
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
